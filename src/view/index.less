@@ -1,0 +1,142 @@
+.edit {
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    overflow: hidden;
+    -webkit-user-select: none;
+    user-select: none;
+    transition: 3s;
+    /* 组件区 */
+    .widgetview {
+      width: 20%;
+      height: 100%;
+      z-index: 1;
+  
+      .tabs {
+        width: 100%;
+        height: 100%;
+        border-right: 2px dashed black;
+  
+        .tabDraggable {
+          padding: 0.3rem 1rem;
+          height: 40px;
+          display: flex;
+          align-items: center;
+          border-bottom: 1px dashed gray;
+          &:hover {
+            background-color: rgba(0, 0, 0, 0.1);
+          }
+        }
+        .tabDraggablebg {
+          background-color: rgba(0, 0, 0, 0.1);
+        }
+      }
+    }
+    /* 样式区 */
+    .editview {
+      width: 20%;
+      min-width: 250px;
+      height: 100%;
+      border-left: 2px dashed black;
+      z-index: 1;
+      .editView {
+        height: 100%;
+        width: 100%;
+      }
+    }
+  
+    /* 视图区 */
+    .showview {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      background-color: rgba(131, 131, 131, 0.1);
+      position: relative;
+      z-index: 0;
+  
+      .showview_nav {
+        width: 100%;
+        height: 30px;
+        background-color: white;
+        border-bottom: 1px solid rgb(190, 190, 190);
+        z-index: 1;
+        display: flex;
+        align-items: center;
+        padding-left: 5px;
+        .showview_nav_item {
+          padding: 0 0.5rem;
+          border: 1px solid skyblue;
+          color: rgb(43, 43, 43);
+          font-weight: 900;
+          height: 100%;
+          width: 150px;
+          border-radius: 3px;
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          transition: 0.3s;
+          .showview_nav_item_closeBtn {
+            width: 15px;
+            height: 15px;
+            border-radius: 15px;
+            padding: 3px;
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: 0.3s;
+            &:hover {
+              background-color: rgba(255, 255, 255, 0.5);
+            }
+            img {
+              width: 100%;
+              height: 100%;
+            }
+          }
+        }
+        .showview_nav_more {
+          font-size: 1.5rem;
+          transition: 0.3s;
+          width: 30px;
+          height: 30px;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          &:hover {
+            background-color: rgb(225, 225, 225);
+          }
+        }
+      }
+  
+      .main_view {
+        background-color: white;
+        position: relative;
+      }
+    }
+  }
+  .box {
+    position: absolute;
+  }
+  .inner-weiget {
+    width: 100%;
+    height: 100%;
+  }
+  .standard-y-line {
+    height: 99%;
+    width: 0px;
+    border: 1px dashed red;
+    position: absolute;
+  }
+  .standard-x-line {
+    height: 0px;
+    width: 99%;
+    border: 1px dashed red;
+    position: absolute;
+  }
+  .frame {
+    position: absolute;
+    -webkit-user-select: none;
+    user-select: none;
+    outline: 2px dashed gray;
+  }
