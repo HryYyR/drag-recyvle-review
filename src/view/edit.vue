@@ -1,5 +1,5 @@
 <template>
-  <div class="edit">
+  <div class="edit" @contextmenu.prevent="">
     <!-- 组件区 -->
     <div
       class="widgetview"
@@ -10,12 +10,12 @@
     >
       <el-tabs
         v-model="data.widgetName"
-        tabPosition="left"
+        tabPosition="top"
         class="tabs"
         type="border-card"
         stretch
       >
-        <el-tab-pane label="工具" name="tool">
+        <el-tab-pane label="工具" name="tool" v-if="false">
           <toolList />
         </el-tab-pane>
         <el-tab-pane label="组件" name="widget">
@@ -110,6 +110,7 @@
           @contextmenu="onContextMenu($event, item)"
           @click="draggerOnClick($event, item)"
           @mouseup.native="dragMouseUp(index)"
+          @mousedown.native="dragMouseDown($event, index)"
           @dragging="(info:any)=>onWidgetDrap(info,item)"
           @dragstop="onWidgetDragStop"
           :preventActiveBehavior="false"
@@ -118,7 +119,7 @@
         >
           <component
             class="inner-weiget"
-            :style="{ width: '100%', height: '100%' }"
+            :style="{ width: '100%', height: '100%', opacity: item.opacity }"
             :is="dom[item.component]"
             :value="item.value"
             :styles="item.styles"
@@ -168,6 +169,7 @@
       @changeScreen="changeScreen"
       @changeBgColor="changeBgColor"
       @exportHTML="exportPNG"
+      @exportJSON="exportJSON"
       @changeDirection="changeDirection"
       :current="getNowEditFocused()"
       :currentForm="getNowEditForm()"
@@ -321,6 +323,10 @@ watch(
   { immediate: true }
 );
 onMounted(() => {
+  setInterval(() => {
+    data.listLength = data.list.length;
+  }, 1000);
+
   window.addEventListener("keyup", (e) => listenKeyup(e));
   window.addEventListener("keydown", (e) => listenKeydown(e));
   showview.value &&
@@ -342,9 +348,10 @@ let mainView: any = ref();
 let showview: any = ref();
 let widget: any = ref(""); //所有组件的实例
 
-watch(data.list, (newvalue, oldvalue) => {
-  data.listLength = data.list.length;
-});
+// 有bug，没用
+// watch(data.list, (newvalue, oldvalue) => {
+//   data.listLength = data.list.length;
+// });
 
 let pageId: number = 0; //新建页面编号
 // 添加或者新建一个页面
@@ -446,6 +453,27 @@ const removeThisView = (id: number) => {
     .catch((e) => {});
 };
 
+// 导出为JSON
+const exportJSON = async () => {
+  let DATA = {
+    list: data.list,
+    listLength: data.listLength,
+    mainWidth: data.mainWidth,
+    mainHeight: data.mainHeight,
+    viewConfig: data.viewConfig,
+  };
+  let json = JSON.stringify(DATA);
+  const blob = new Blob([json], {
+    type: "application/json",
+  });
+  const objectURL = URL.createObjectURL(blob);
+  const aTag = document.createElement("a");
+  aTag.href = objectURL;
+  aTag.download = "config.json";
+  aTag.click();
+  URL.revokeObjectURL(objectURL);
+};
+
 // 导出为PNG
 const exportPNG = async () => {
   data.viewConfig.scale = 1;
@@ -530,6 +558,7 @@ const adddrag = (e: any, index: number) => {
     styles: CurrentWidget.style,
     styleForm: CurrentWidget.styleForm,
     aspectRatio: false, //保持比例缩放
+    opacity: 1, //透明度：目前用于拖拽时穿透显示clone元素
   });
 
   // 获取最新的组件
@@ -577,8 +606,13 @@ const recoverdraw = () => {
   data.list = recordList[len] || [];
 };
 
-// mouseup用于记录
+// mouseup用于记录和 删除克隆镜像
 const dragMouseUp = (id: number) => {
+  // 删除clone
+  document.querySelectorAll(".cloneNode")?.forEach((item) => item.remove());
+  data.list[id].opacity = 1;
+
+  // 记录
   let current = data.list[id];
   let Widget = widget.value[0].rect;
   // console.log(current, Widget);
@@ -592,6 +626,29 @@ const dragMouseUp = (id: number) => {
   }
   // setNewList(current, Widget);
   // record();
+};
+
+// 用于添加移动镜像
+const dragMouseDown = (e: MouseEvent, id: number) => {
+  data.list[id].opacity = 0.3;
+  let cloneNode = cloneTheNode(e);
+  mainView.value.appendChild(cloneNode);
+};
+
+// clone一个元素并设置他的宽高偏移量 和 类名‘cloneNode’
+const cloneTheNode = (e: any) => {
+  let cloneNODE: HTMLElement = e.target?.parentNode.cloneNode(true);
+  let { left, top, width, height } = e.target?.parentNode.parentNode.style;
+  let clonePPStyle = e.target?.parentNode.parentNode.parentNode.style;
+  cloneNODE.style.position = "absolute ";
+  cloneNODE.style.left = left || clonePPStyle.left;
+  cloneNODE.style.top = top || clonePPStyle.top;
+  cloneNODE.style.width = width || cloneNODE.style.width;
+  cloneNODE.style.height = height || cloneNODE.style.height;
+
+  cloneNODE.classList.add("cloneNode");
+
+  return cloneNODE;
 };
 
 //记录时调用，设置新的数据
@@ -639,7 +696,7 @@ const OnWidgetMouseDown = (e: any, widget: any) => {
 };
 
 // 组件点击事件
-const draggerOnClick = (e: MouseEvent, item: any) => {
+const draggerOnClick = (e: any, item: any) => {
   setNowEditFocused(item);
   currentWidget = item;
 };
@@ -945,7 +1002,7 @@ const listenKeydown = (e: KeyboardEvent) => {
     record();
   }
   if (e.code == "Space") {
-    document.body.style.cursor = "url(/press.ico),auto";
+    document.body.style.cursor = "url(https://hyyyh.top:3001/press.ico),auto";
     data.isClickSpace = true;
   }
 };
@@ -1056,5 +1113,146 @@ const changeBgColor = (val: string) => {
 </script>
 
 <style scoped lang="less">
-@import "./index.less";
+.edit {
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  overflow: hidden;
+  -webkit-user-select: none;
+  user-select: none;
+  transition: 3s;
+  /* 组件区 */
+  .widgetview {
+    width: 20%;
+    height: 100%;
+    z-index: 1;
+
+    .tabs {
+      width: 100%;
+      height: 100%;
+      border-right: 2px dashed black;
+
+      .tabDraggable {
+        padding: 0.3rem 1rem;
+        height: 40px;
+        display: flex;
+        align-items: center;
+        border-bottom: 1px dashed gray;
+        &:hover {
+          background-color: rgba(0, 0, 0, 0.1);
+        }
+      }
+      .tabDraggablebg {
+        background-color: rgba(0, 0, 0, 0.1);
+      }
+    }
+  }
+  /* 样式区 */
+  .editview {
+    width: 20%;
+    min-width: 250px;
+    height: 100%;
+    border-left: 2px dashed black;
+    z-index: 1;
+    .editView {
+      height: 100%;
+      width: 100%;
+    }
+  }
+
+  /* 视图区 */
+  .showview {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background-color: rgba(131, 131, 131, 0.1);
+    position: relative;
+    z-index: 0;
+
+    .showview_nav {
+      width: 100%;
+      height: 30px;
+      background-color: white;
+      border-bottom: 1px solid rgb(190, 190, 190);
+      z-index: 1;
+      display: flex;
+      align-items: center;
+      padding-left: 5px;
+      .showview_nav_item {
+        padding: 0 0.5rem;
+        border: 1px solid skyblue;
+        color: rgb(43, 43, 43);
+        font-weight: 900;
+        height: 100%;
+        width: 150px;
+        border-radius: 3px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        transition: 0.3s;
+        .showview_nav_item_closeBtn {
+          width: 15px;
+          height: 15px;
+          border-radius: 15px;
+          padding: 3px;
+          position: relative;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          transition: 0.3s;
+          &:hover {
+            background-color: rgba(255, 255, 255, 0.5);
+          }
+          img {
+            width: 100%;
+            height: 100%;
+          }
+        }
+      }
+      .showview_nav_more {
+        font-size: 1.5rem;
+        transition: 0.3s;
+        width: 30px;
+        height: 30px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        &:hover {
+          background-color: rgb(225, 225, 225);
+        }
+      }
+    }
+
+    .main_view {
+      background-color: white;
+      position: relative;
+    }
+  }
+}
+.box {
+  position: absolute;
+}
+.inner-weiget {
+  width: 100%;
+  height: 100%;
+}
+.standard-y-line {
+  height: 99%;
+  width: 0px;
+  border: 1px dashed red;
+  position: absolute;
+}
+.standard-x-line {
+  height: 0px;
+  width: 99%;
+  border: 1px dashed red;
+  position: absolute;
+}
+.frame {
+  position: absolute;
+  -webkit-user-select: none;
+  user-select: none;
+  outline: 2px dashed gray;
+}
 </style>

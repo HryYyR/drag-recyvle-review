@@ -1,4 +1,4 @@
-import { createRouter, createWebHashHistory } from 'vue-router'   // 使用插件可以不加这个
+import { createRouter, createWebHashHistory, createWebHistory } from 'vue-router'   // 使用插件可以不加这个
 import index from '../view/index.vue'
 import edit from '../view/edit.vue'
 

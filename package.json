@@ -11,7 +11,6 @@
   "dependencies": {
     "@imengyu/vue3-context-menu": "^1.1.1",
     "@videojs-player/vue": "^1.0.0",
-    "deepmerge": "^4.2.2",
     "echarts": "^5.4.0",
     "element-plus": "^2.2.17",
     "html2canvas": "^1.4.1",
@@ -21,6 +20,7 @@
     "sat": "^0.9.0",
     "terser": "^5.15.1",
     "video.js": "^7.20.3",
+    "vite-plugin-compression": "^0.5.1",
     "vue": "^3.2.37",
     "vue-drag-resize": "^2.0.3",
     "vue-echarts": "^6.2.3",
@@ -30,6 +30,7 @@
   "devDependencies": {
     "@types/sat": "^0.0.31",
     "@vitejs/plugin-vue": "^3.1.0",
+    "compression-webpack-plugin": "^10.0.0",
     "typescript": "^4.6.4",
     "unplugin-auto-import": "^0.11.2",
     "unplugin-vue-components": "^0.22.7",

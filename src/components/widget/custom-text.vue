@@ -6,6 +6,8 @@
       opacity: styles.opacity,
       backgroundColor: styles.bgColor,
       position: 'relative',
+      width: '100%',
+      height: '100%',
       padding: `${styles.padding}px`,
       margin: `${styles.margin}px`,
     }"

@@ -26,16 +26,28 @@ let option = computed(() => {
     xAxis: {
       show: props.styles.xAxisVisible,
       type: "category",
-      data: props.value?.map((item: any) => item.name),
+      data: JSON.parse(props.styles.xdata),
     },
     yAxis: {
+      show: props.styles.yAxisVisible,
       type: "value",
+    },
+    title: {
+      show: props.styles.titleVisible,
+      left: "center",
+      text: props.styles.value,
     },
     series: [
       {
-        data: props.value?.map((item: any) => item.value),
+        data: JSON.parse(props.styles.ydata),
         type: "bar",
-        showBackground: props.styles.bgColor,
+        showBackground: props.styles.bgColorVisible,
+        backgroundStyle: {
+          color: props.styles.bgColor,
+        },
+        itemStyle: {
+          color: props.styles.Color,
+        },
       },
     ],
   };

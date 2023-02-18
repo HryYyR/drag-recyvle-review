@@ -26,14 +26,20 @@ let option = computed(() => {
       show: props.styles.xAxisVisible,
       type: "category",
       boundaryGap: false,
-      data: props.value?.map((item: any) => item.name),
+      data: JSON.parse(props.styles.xdata),
     },
     yAxis: {
       type: "value",
+      show: props.styles.yAxisVisible,
+    },
+    title: {
+      show: props.styles.titleVisible,
+      left: "center",
+      text: props.styles.value,
     },
     series: [
       {
-        data: props.value?.map((item: any) => item.value),
+        data: JSON.parse(props.styles.ydata),
         type: "line",
         areaStyle: {
           color: props.styles.areaColor,

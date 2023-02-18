@@ -53,6 +53,12 @@
           >导出为PNG</el-button
         >
       </div>
+
+      <div>
+        <el-button type="primary" class="exportHTML" @click="() => emit('exportJSON')"
+          >导出JSON数据</el-button
+        >
+      </div>
     </el-tab-pane>
     <el-tab-pane label="样式" name="style">
       <el-form label-width="100px" :model="data.styleFormData" style="max-width: 460px">
@@ -87,7 +93,7 @@ import {
   defineEmits,
   watchEffect,
 } from "vue";
-const emit = defineEmits(["change", "withdraw", "recoverdraw",'changeScreen','changeBgColor','exportHTML','changeDirection']);
+const emit = defineEmits(["change", "withdraw", "recoverdraw",'changeScreen','changeBgColor','exportHTML','exportJSON','changeDirection']);
 const predefineColors = ref([
   '#ff4500',
   '#ff8c00',
@@ -142,11 +148,7 @@ watch(props, (newValue, oldValue) => {
   data.styleFormData = props.currentForm;
   data.viewconfig = props.viewConfig
 
-
-
 Object.keys(data.styleData).length ? data.styleName='style':data.styleName='view'
-
-
 });
 watch(
   () => data.styleData,
